@@ -10,3 +10,5 @@ Utility functions for use in tests with faker.
 `npm install faker-utils`
 
 ## Usage
+
+setupFiles: ["faker-utils/dist/setup.js"];
