@@ -4,7 +4,7 @@
     "esModuleInterop": true,
     "noImplicitAny": true,
     "isolatedModules": true,
-    "lib": ["ESNext", "DOM"],
+    "lib": ["ESNext"],
     "moduleResolution": "node",
     "strict": true,
     "noUncheckedIndexedAccess": true,

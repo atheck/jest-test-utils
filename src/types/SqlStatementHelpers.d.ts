@@ -1,4 +1,4 @@
-interface CustomMatchers<TResult = unknown> {
+interface SqlStatementMatchers<TResult = unknown> {
     toSelectFromTable: (table: string) => TResult,
     toReplaceIntoTable: (table: string) => TResult,
     toInsertIntoTable: (table: string) => TResult,
@@ -13,9 +13,10 @@ interface CustomMatchers<TResult = unknown> {
 
 declare global {
     namespace jest {
-        interface Expect extends CustomMatchers {}
-        interface Matchers<TResult> extends CustomMatchers<TResult> {}
-        interface InverseAsymmetricMatchers extends CustomMatchers {}
+        interface Expect extends SqlStatementMatchers {}
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/ban-types
+        interface Matchers<TR, TT = {}> extends SqlStatementMatchers<TR> {}
+        interface InverseAsymmetricMatchers extends SqlStatementMatchers {}
     }
 }
 
