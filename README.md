@@ -11,4 +11,4 @@ Utility functions for use in tests with faker.
 
 ## Usage
 
-setupFiles: ["jest-test-utils/dist/setup.js"];
+setupFilesAfterEnv: ["jest-test-utils/dist/setup.js"];
