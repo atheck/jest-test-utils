@@ -1,7 +1,7 @@
 {
-  "name": "faker-utils",
+  "name": "jest-test-utils",
   "version": "0.0.1",
-  "description": "Utilities for tests using faker",
+  "description": "Utilities for tests using jests",
   "author": "atheck",
   "license": "MIT",
   "scripts": {
@@ -28,13 +28,13 @@
     "tslib": "2.4.0",
     "typescript": "4.7.4"
   },
-  "homepage": "https://github.com/atheck/faker-utils",
+  "homepage": "https://github.com/atheck/jest-test-utils",
   "repository": {
     "type": "git",
-    "url": "https://github.com/atheck/faker-utils.git"
+    "url": "https://github.com/atheck/jest-test-utils.git"
   },
   "keywords": [
-    "faker",
+    "jest",
     "utilities",
     "test"
   ],
