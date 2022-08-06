@@ -1,5 +1,5 @@
-import { createI18nValue } from "./createI18nValue";
-import { isInstalled } from "./isInstalled";
+import { createI18nValue } from "../createI18nValue";
+import { isInstalled } from "../internal/isInstalled";
 
 function mockCreateI18nValue (key: string, options?: unknown): string {
     return createI18nValue(key, options);
