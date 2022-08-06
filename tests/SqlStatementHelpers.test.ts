@@ -1,5 +1,3 @@
-import "../src/SqlStatementHelpers";
-
 describe("SqlStatementHelpers", () => {
     describe("toSelectFromTable", () => {
         const statement = "SELECT FROM table";
@@ -80,4 +78,94 @@ describe("SqlStatementHelpers", () => {
             expect(() => expect(statement).not.toDeleteFromTable("table")).toThrow("expected statement not to delete from table.");
         });
     });
+
+    describe("toSelectAllPropertiesOf", () => {
+        const Schema = {
+            id: "id",
+            value: "value",
+        };
+        const positiveStatement = "SELECT id, value FROM table";
+        const negativeStatement = "SELECT id FROM table";
+        const negativeStatementWhere = "SELECT id FROM table WHERE value = ?";
+
+        it("positive", () => {
+            // act
+            expect(positiveStatement).toSelectAllPropertiesOf(Schema);
+            expect(negativeStatement).not.toSelectAllPropertiesOf(Schema);
+            expect(negativeStatementWhere).not.toSelectAllPropertiesOf(Schema);
+        });
+
+        it("negative", () => {
+            // act
+            expect(() => expect(negativeStatement).toSelectAllPropertiesOf(Schema)).toThrow("expected column value to be selected.");
+            expect(() => expect(positiveStatement).not.toSelectAllPropertiesOf(Schema)).toThrow("expected to not select all fields of object.");
+        });
+    });
+
+    describe("toSetColumn", () => {
+        const statement = "UPDATE table SET value = ?";
+
+        it("positive", () => {
+            // act
+            expect(statement).toSetColumn("value");
+            expect(statement).not.toSetColumn("id");
+        });
+
+        it("negative", () => {
+            // act
+            expect(() => expect(statement).toSetColumn("id")).toThrow("expected statement to set column id.");
+            expect(() => expect(statement).not.toSetColumn("value")).toThrow("expected statement not to set column value.");
+        });
+    });
+
+    describe("toUseColumnsInCorrectOrder", () => {
+        const statement = "UPDATE table SET id = ?, value = ?";
+
+        it("positive", () => {
+            // act
+            expect(statement).toUseColumnsInCorrectOrder("id", "value");
+            expect(statement).not.toUseColumnsInCorrectOrder("value", "id");
+        });
+
+        it("negative", () => {
+            // act
+            expect(() => expect(statement).toUseColumnsInCorrectOrder("value", "id")).toThrow("expected column id to be used in correct place.");
+            expect(() => expect(statement).not.toUseColumnsInCorrectOrder("id", "value")).toThrow("expected columns not to be used in correct order.");
+        });
+    });
+
+    describe("toUseWhereClause", () => {
+        const statement = "SELECT id, value FROM table WHERE id = ?";
+
+        it("positive", () => {
+            // act
+            expect(statement).toUseWhereClause("id = ?");
+            expect(statement).not.toUseWhereClause("value = ?");
+        });
+
+        it("negative", () => {
+            // act
+            expect(() => expect(statement).toUseWhereClause("value = ?")).toThrow("expected statement to use where clause value = ?.");
+            expect(() => expect(statement).not.toUseWhereClause("id = ?")).toThrow("expected statement not use where clause id = ?.");
+        });
+    });
+
+    describe("toOrderBy", () => {
+        const statement = "SELECT id, value FROM table ORDER BY id";
+
+        it("positive", () => {
+            // act
+            expect(statement).toOrderBy("id");
+            expect(statement).not.toOrderBy("value");
+        });
+
+        it("negative", () => {
+            // act
+            expect(() => expect(statement).toOrderBy("value")).toThrow("expected statement to order by column value.");
+            expect(() => expect(statement).not.toOrderBy("id")).toThrow("expected statement not to order by column id.");
+        });
+    });
 });
+
+// eslint-disable-next-line jest/no-export
+export {};
