@@ -1,3 +1,3 @@
 import "regenerator-runtime/runtime";
-import "../src/jest/SqlStatementHelpers";
-import "../src/jest/setup";
+import "../src/jest/mockI18next";
+import "../src/jest/sqlStatementMatchers";
