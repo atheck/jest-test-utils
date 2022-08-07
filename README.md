@@ -41,7 +41,3 @@ Add this to your jest config to setup SQL statement matchers:
 ### manyOf
 
 ...
-
-### createI18nValue
-
-...

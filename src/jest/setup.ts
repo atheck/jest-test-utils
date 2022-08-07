@@ -1,8 +1,15 @@
-import { createI18nValue } from "../createI18nValue";
 import { isInstalled } from "../internal/isInstalled";
 
 function mockCreateI18nValue (key: string, options?: unknown): string {
-    return createI18nValue(key, options);
+    if (options && typeof options === "object") {
+        const cleanedOptions = { ...options, interpolation: undefined };
+
+        delete cleanedOptions.interpolation;
+
+        return JSON.stringify({ key, options: cleanedOptions });
+    }
+
+    return key;
 }
 
 if (isInstalled("jest", "i18next")) {
