@@ -15,6 +15,27 @@ describe("SqlStatementHelpers", () => {
         });
     });
 
+    describe("toSelectDistinctFromTable", () => {
+        const correctStatement = "SELECT DISTINCT FROM table";
+        const incorrectStatement = "SELECT FROM table";
+
+        it("positive", () => {
+            // act
+            expect(correctStatement).toSelectDistinctFromTable("table");
+            expect(correctStatement).not.toSelectDistinctFromTable("wrong");
+            expect(incorrectStatement).not.toSelectDistinctFromTable("table");
+            expect(incorrectStatement).not.toSelectDistinctFromTable("wrong");
+        });
+
+        it("negative", () => {
+            // act
+            expect(() => expect(correctStatement).toSelectDistinctFromTable("wrong")).toThrow("expected statement to select distinct from wrong.");
+            expect(() => expect(correctStatement).not.toSelectDistinctFromTable("table")).toThrow("expected statement not to select distinct from table.");
+            expect(() => expect(incorrectStatement).toSelectDistinctFromTable("wrong")).toThrow("expected statement to select distinct from wrong.");
+            expect(() => expect(incorrectStatement).toSelectDistinctFromTable("table")).toThrow("expected statement to select distinct from table.");
+        });
+    });
+
     describe("toReplaceIntoTable", () => {
         const statement = "REPLACE INTO table";
 
@@ -151,7 +172,7 @@ describe("SqlStatementHelpers", () => {
     });
 
     describe("toOrderBy", () => {
-        const statement = "SELECT id, value FROM table ORDER BY id";
+        const statement = "SELECT id, value FROM table GROUP BY value ORDER BY id";
 
         it("positive", () => {
             // act
@@ -163,6 +184,22 @@ describe("SqlStatementHelpers", () => {
             // act
             expect(() => expect(statement).toOrderBy("value")).toThrow("expected statement to order by column value.");
             expect(() => expect(statement).not.toOrderBy("id")).toThrow("expected statement not to order by column id.");
+        });
+    });
+
+    describe("toGroupBy", () => {
+        const statement = "SELECT id, value FROM table GROUP BY id ORDER BY value";
+
+        it("positive", () => {
+            // act
+            expect(statement).toGroupBy("id");
+            expect(statement).not.toGroupBy("value");
+        });
+
+        it("negative", () => {
+            // act
+            expect(() => expect(statement).toGroupBy("value")).toThrow("expected statement to group by column value.");
+            expect(() => expect(statement).not.toGroupBy("id")).toThrow("expected statement not to group by column id.");
         });
     });
 });

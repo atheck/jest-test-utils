@@ -1,5 +1,6 @@
 interface SqlStatementMatchers<TResult = unknown> {
     toSelectFromTable: (table: string) => TResult,
+    toSelectDistinctFromTable: (table: string) => TResult,
     toReplaceIntoTable: (table: string) => TResult,
     toInsertIntoTable: (table: string) => TResult,
     toUpdateTable: (table: string) => TResult,
@@ -9,6 +10,7 @@ interface SqlStatementMatchers<TResult = unknown> {
     toUseColumnsInCorrectOrder: (...columns: string []) => TResult,
     toUseWhereClause: (comparison: string) => TResult,
     toOrderBy: (column: string) => TResult,
+    toGroupBy: (column: string) => TResult,
 }
 
 declare global {

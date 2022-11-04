@@ -1,8 +1,14 @@
 expect.extend({
     toSelectFromTable (statement: string, table: string) {
-        const pass = (/\bSELECT\b/u).test(statement) && new RegExp(`\\bFROM ${escapeRegExp(table)}\\b`, "u").test(statement);
+        const pass = (/\bSELECT\b/u).test(statement) && new RegExp(`\\bFROM\\s+${escapeRegExp(table)}\\b`, "u").test(statement);
 
         return createMatchResult(pass, `expected statement to select from ${table}.`, `expected statement not to select from ${table}.`);
+    },
+
+    toSelectDistinctFromTable (statement: string, table: string) {
+        const pass = (/\bSELECT\s+DISTINCT\b/u).test(statement) && new RegExp(`\\bFROM\\s+${escapeRegExp(table)}\\b`, "u").test(statement);
+
+        return createMatchResult(pass, `expected statement to select distinct from ${table}.`, `expected statement not to select distinct from ${table}.`);
     },
 
     toReplaceIntoTable (statement: string, table: string) {
@@ -68,9 +74,15 @@ expect.extend({
     },
 
     toOrderBy (statement: string, column: string) {
-        const pass = new RegExp(`\\bORDER BY\\b(.|\\n)+${escapeRegExp(column)}`, "u").test(statement);
+        const pass = new RegExp(`\\bORDER BY\\b(\\s|,|\\n)+${escapeRegExp(column)}`, "u").test(statement);
 
         return createMatchResult(pass, `expected statement to order by column ${column}.`, `expected statement not to order by column ${column}.`);
+    },
+
+    toGroupBy (statement: string, column: string) {
+        const pass = new RegExp(`\\bGROUP BY\\b(\\s|,|\\n)+${escapeRegExp(column)}`, "u").test(statement);
+
+        return createMatchResult(pass, `expected statement to group by column ${column}.`, `expected statement not to group by column ${column}.`);
     },
 });
 
