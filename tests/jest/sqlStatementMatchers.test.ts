@@ -100,6 +100,22 @@ describe("SqlStatementHelpers", () => {
         });
     });
 
+    describe("toJoinTable", () => {
+        const statement = "JOIN table";
+
+        it("positive", () => {
+            // act
+            expect(statement).toJoinTable("table");
+            expect(statement).not.toJoinTable("wrong");
+        });
+
+        it("negative", () => {
+            // act
+            expect(() => expect(statement).toJoinTable("wrong")).toThrow("expected statement to join wrong.");
+            expect(() => expect(statement).not.toJoinTable("table")).toThrow("expected statement not to join table.");
+        });
+    });
+
     describe("toSelectAllPropertiesOf", () => {
         const Schema = {
             id: "id",

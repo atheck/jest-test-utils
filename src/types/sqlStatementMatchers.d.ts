@@ -5,6 +5,7 @@ interface SqlStatementMatchers<TResult = unknown> {
     toInsertIntoTable: (table: string) => TResult,
     toUpdateTable: (table: string) => TResult,
     toDeleteFromTable: (table: string) => TResult,
+    toJoinTable: (table: string) => TResult,
     toSelectAllPropertiesOf: (obj: unknown) => TResult,
     toSetColumn: (column: string, value?: string) => TResult,
     toUseColumnsInCorrectOrder: (...columns: string []) => TResult,
