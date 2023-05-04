@@ -110,7 +110,7 @@ function verifySelectsAllColumns (statement: string, ...fields: string []): stri
 }
 
 function escapeRegExp (value: string): string {
-    return value.replace(/[.*+?^${}()|[\]\\]/ug, "\\$&");
+    return value.replaceAll(/[.*+?^${}()|[\]\\]/ug, "\\$&");
 }
 
 function findColumn (statement: string, field: string): RegExpExecArray | null {
