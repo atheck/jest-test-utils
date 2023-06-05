@@ -57,6 +57,12 @@ expect.extend({
         return createMatchResult(pass, `expected statement to set column ${column}.`, `expected statement not to set column ${column}.`);
     },
 
+    toInsertValues (statement: string) {
+        const pass = (/\bVALUES\s+\(/u).test(statement);
+
+        return createMatchResult(pass, "expected statement to insert values.", "expected statement not to insert values.");
+    },
+
     toUseColumnsInCorrectOrder (statement: string, ...columns: string []) {
         let statementPart = statement;
 

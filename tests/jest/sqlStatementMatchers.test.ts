@@ -155,6 +155,23 @@ describe("SqlStatementHelpers", () => {
         });
     });
 
+    describe("toInsertValues", () => {
+        const positiveStatement = "INSERT INTO table (id) VALUES (1)";
+        const negativeStatement = "SELECT id FROM table";
+
+        it("positive", () => {
+            // act
+            expect(positiveStatement).toInsertValues();
+            expect(negativeStatement).not.toInsertValues();
+        });
+
+        it("negative", () => {
+            // act
+            expect(() => expect(negativeStatement).toInsertValues()).toThrow("expected statement to insert values.");
+            expect(() => expect(positiveStatement).not.toInsertValues()).toThrow("expected statement not to insert values.");
+        });
+    });
+
     describe("toUseColumnsInCorrectOrder", () => {
         const statement = "UPDATE table SET id = ?, value = ?";
 

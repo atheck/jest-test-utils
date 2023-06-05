@@ -36,15 +36,19 @@ After this mock is applied `i18next.t()` no longer returns the translation of th
 | function | description |
 | --- | --- |
 | `toSelectFromTable` | Verify that the sql statement selects from the specified table. |
+| `toSelectDistinctFromTable` | Verify that the sql statement selects distinct values from the specified table. |
 | `toReplaceIntoTable` | Verify that the sql statement replaces into the specified table. |
 | `toInsertIntoTable` | Verify that the sql statement inserts into the specified table. |
 | `toUpdateTable` | Verify that the sql statement updates the specified table. |
 | `toDeleteFromTable` | Verify that the sql statement deletes from the specified table. |
+| `toJoinTable` | Verify that the sql statement joins another table. |
 | `toSelectAllPropertiesOf` | Verify that the sql statement selects all the columns of the specified DTO object. |
 | `toSetColumn` | Verify that the sql statement sets the value of the specified column. |
+| `toInsertValues` | Verify that the sql statement inserts values into a table. |
 | `toUseColumnsInCorrectOrder` | Verify that the sql statement uses all specified columns in the correct order. |
 | `toUseWhereClause` | Verify that the sql statement uses the specified where clause. |
 | `toOrderBy` | Verify that the sql statement orders by the specified column. |
+| `toGroupBy` | Verify that the sql statement groups the result by the specified column. |
 
 ### manyOf
 

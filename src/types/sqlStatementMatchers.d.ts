@@ -8,6 +8,7 @@ interface SqlStatementMatchers<TResult = unknown> {
     toJoinTable: (table: string) => TResult,
     toSelectAllPropertiesOf: (obj: unknown) => TResult,
     toSetColumn: (column: string, value?: string) => TResult,
+    toInsertValues: () => TResult,
     toUseColumnsInCorrectOrder: (...columns: string []) => TResult,
     toUseWhereClause: (comparison: string) => TResult,
     toOrderBy: (column: string) => TResult,
