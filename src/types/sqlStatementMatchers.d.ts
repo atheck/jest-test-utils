@@ -2,7 +2,7 @@ interface SqlStatementMatchers<TResult = unknown> {
     toSelectFromTable: (table: string) => TResult,
     toSelectDistinctFromTable: (table: string) => TResult,
     toReplaceIntoTable: (table: string) => TResult,
-    toInsertIntoTable: (table: string) => TResult,
+    toInsertIntoTable: (table: string, options?: InsertOptions) => TResult,
     toUpdateTable: (table: string) => TResult,
     toDeleteFromTable: (table: string) => TResult,
     toJoinTable: (table: string) => TResult,
@@ -15,6 +15,10 @@ interface SqlStatementMatchers<TResult = unknown> {
     toGroupBy: (column: string) => TResult,
 }
 
+interface InsertOptions {
+    or: "ABORT" | "FAIL" | "IGNORE" | "REPLACE" | "ROLLBACK",
+}
+
 declare global {
     namespace jest {
         interface Expect extends SqlStatementMatchers {}
@@ -24,4 +28,4 @@ declare global {
     }
 }
 
-export {};
+export type { InsertOptions };

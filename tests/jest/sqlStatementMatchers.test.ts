@@ -54,6 +54,7 @@ describe("SqlStatementHelpers", () => {
 
     describe("toInsertIntoTable", () => {
         const statement = "INSERT INTO table";
+        const replaceStatement = "INSERT OR REPLACE INTO table";
 
         it("positive", () => {
             // act
@@ -65,6 +66,18 @@ describe("SqlStatementHelpers", () => {
             // act
             expect(() => expect(statement).toInsertIntoTable("wrong")).toThrow("expected statement to insert into wrong.");
             expect(() => expect(statement).not.toInsertIntoTable("table")).toThrow("expected statement not to insert into table.");
+        });
+
+        it("positive with or option", () => {
+            // act
+            expect(replaceStatement).toInsertIntoTable("table", { or: "REPLACE" });
+            expect(replaceStatement).not.toInsertIntoTable("table", { or: "FAIL" });
+        });
+
+        it("negative with or option", () => {
+            // act
+            expect(() => expect(replaceStatement).toInsertIntoTable("table")).toThrow("expected statement to insert into table.");
+            expect(() => expect(replaceStatement).not.toInsertIntoTable("table", { or: "REPLACE" })).toThrow("expected statement not to insert or replace into table.");
         });
     });
 

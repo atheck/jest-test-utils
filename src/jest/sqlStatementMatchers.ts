@@ -1,3 +1,5 @@
+import { InsertOptions } from "../types/sqlStatementMatchers";
+
 expect.extend({
     toSelectFromTable (statement: string, table: string) {
         const pass = (/\bSELECT\b/u).test(statement) && new RegExp(`\\bFROM\\s+${escapeRegExp(table)}\\b`, "u").test(statement);
@@ -17,10 +19,18 @@ expect.extend({
         return createMatchResult(pass, `expected statement to replace into ${table}.`, `expected statement not to replace into ${table}.`);
     },
 
-    toInsertIntoTable (statement: string, table: string) {
-        const pass = new RegExp(`\\bINSERT\\s+INTO\\s+${escapeRegExp(table)}\\b`, "u").test(statement);
+    toInsertIntoTable (statement: string, table: string, options?: InsertOptions) {
+        let orStatement = "";
+        let orMessage = "";
 
-        return createMatchResult(pass, `expected statement to insert into ${table}.`, `expected statement not to insert into ${table}.`);
+        if (options?.or) {
+            orStatement = `\\s+OR\\s+${options.or}`;
+            orMessage = ` or ${options.or.toLowerCase()}`;
+        }
+
+        const pass = new RegExp(`\\bINSERT${orStatement}\\s+INTO\\s+${escapeRegExp(table)}\\b`, "u").test(statement);
+
+        return createMatchResult(pass, `expected statement to insert${orMessage} into ${table}.`, `expected statement not to insert${orMessage} into ${table}.`);
     },
 
     toUpdateTable (statement: string, table: string) {
@@ -139,5 +149,3 @@ function createMatchResult (pass: boolean, positiveMessage: string, negativeMess
         message: () => positiveMessage,
     };
 }
-
-export {};

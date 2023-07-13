@@ -38,7 +38,7 @@ After this mock is applied `i18next.t()` no longer returns the translation of th
 | `toSelectFromTable` | Verify that the sql statement selects from the specified table. |
 | `toSelectDistinctFromTable` | Verify that the sql statement selects distinct values from the specified table. |
 | `toReplaceIntoTable` | Verify that the sql statement replaces into the specified table. |
-| `toInsertIntoTable` | Verify that the sql statement inserts into the specified table. |
+| `toInsertIntoTable` | Verify that the sql statement inserts into the specified table. In the optional options object you can specify an `OR` action. |
 | `toUpdateTable` | Verify that the sql statement updates the specified table. |
 | `toDeleteFromTable` | Verify that the sql statement deletes from the specified table. |
 | `toJoinTable` | Verify that the sql statement joins another table. |
