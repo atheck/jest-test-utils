@@ -22,8 +22,10 @@ interface InsertOptions {
 declare global {
     namespace jest {
         interface Expect extends SqlStatementMatchers {}
+
         // eslint-disable-next-line @typescript-eslint/naming-convention, @typescript-eslint/no-unused-vars, @typescript-eslint/ban-types
         interface Matchers<R, T = {}> extends SqlStatementMatchers<R> {}
+
         interface InverseAsymmetricMatchers extends SqlStatementMatchers {}
     }
 }
