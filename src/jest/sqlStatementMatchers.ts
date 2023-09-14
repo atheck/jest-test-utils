@@ -61,6 +61,12 @@ expect.extend({
         return createMatchResult(true, "expected to select all columns of object.", "expected to not select all fields of object.");
     },
 
+    toSelectCount (statement: string) {
+        const pass = (/\bSELECT(?<space>\s|\n)+COUNT\(\*\)/u).test(statement);
+
+        return createMatchResult(pass, "expected statement to select COUNT(*).", "expected statement not to select COUNT(*).");
+    },
+
     toSetColumn (statement: string, column: string, value?: string) {
         const pass = new RegExp(`\\bSET\\b(.|\\n)+${escapeRegExp(column)}\\s*=\\s*${escapeRegExp(value ?? "?")}`, "u").test(statement);
 

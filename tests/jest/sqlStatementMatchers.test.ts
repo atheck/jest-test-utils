@@ -152,6 +152,25 @@ describe("SqlStatementHelpers", () => {
         });
     });
 
+    describe("toSelectCount", () => {
+        const positiveStatement = "SELECT COUNT(*) FROM table";
+        const positiveStatementMultiline = "SELECT\nCOUNT(*)\nFROM table";
+        const negativeStatement = "SELECT id FROM table";
+
+        it("positive", () => {
+            // act
+            expect(positiveStatement).toSelectCount();
+            expect(positiveStatementMultiline).toSelectCount();
+            expect(negativeStatement).not.toSelectCount();
+        });
+
+        it("negative", () => {
+            // act
+            expect(() => expect(negativeStatement).toSelectCount()).toThrow("expected statement to select COUNT(*).");
+            expect(() => expect(positiveStatement).not.toSelectCount()).toThrow("expected statement not to select COUNT(*).");
+        });
+    });
+
     describe("toSetColumn", () => {
         const statement = "UPDATE table SET value = ?";
 
