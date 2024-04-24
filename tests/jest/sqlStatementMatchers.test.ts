@@ -1,19 +1,20 @@
+/* eslint-disable jest/require-hook */
 import { describe, expect, it } from "@jest/globals";
 
 describe("SqlStatementHelpers", () => {
 	describe("toSelectFromTable", () => {
 		const statement = "SELECT FROM table";
 
-		it("positive", () => {
+		itCasing(statement, "positive", (casedStatement) => {
 			// act
-			expect(statement).toSelectFromTable("table");
-			expect(statement).not.toSelectFromTable("wrong");
+			expect(casedStatement).toSelectFromTable("table");
+			expect(casedStatement).not.toSelectFromTable("wrong");
 		});
 
-		it("negative", () => {
+		itCasing(statement, "negative", (casedStatement) => {
 			// act
-			expect(() => expect(statement).toSelectFromTable("wrong")).toThrow("expected statement to select from wrong.");
-			expect(() => expect(statement).not.toSelectFromTable("table")).toThrow("expected statement not to select from table.");
+			expect(() => expect(casedStatement).toSelectFromTable("wrong")).toThrow("expected statement to select from wrong.");
+			expect(() => expect(casedStatement).not.toSelectFromTable("table")).toThrow("expected statement not to select from table.");
 		});
 	});
 
@@ -21,26 +22,34 @@ describe("SqlStatementHelpers", () => {
 		const correctStatement = "SELECT DISTINCT FROM table";
 		const incorrectStatement = "SELECT FROM table";
 
-		it("positive", () => {
+		itCasing(correctStatement, "correct positive", (casedStatement) => {
 			// act
-			expect(correctStatement).toSelectDistinctFromTable("table");
-			expect(correctStatement).not.toSelectDistinctFromTable("wrong");
-			expect(incorrectStatement).not.toSelectDistinctFromTable("table");
-			expect(incorrectStatement).not.toSelectDistinctFromTable("wrong");
+			expect(casedStatement).toSelectDistinctFromTable("table");
+			expect(casedStatement).not.toSelectDistinctFromTable("wrong");
 		});
 
-		it("negative", () => {
+		itCasing(incorrectStatement, "incorrect positive", (casedStatement) => {
 			// act
-			expect(() => expect(correctStatement).toSelectDistinctFromTable("wrong")).toThrow(
+			expect(casedStatement).not.toSelectDistinctFromTable("table");
+			expect(casedStatement).not.toSelectDistinctFromTable("wrong");
+		});
+
+		itCasing(correctStatement, "correct negative", (casedStatement) => {
+			// act
+			expect(() => expect(casedStatement).toSelectDistinctFromTable("wrong")).toThrow(
 				"expected statement to select distinct from wrong.",
 			);
-			expect(() => expect(correctStatement).not.toSelectDistinctFromTable("table")).toThrow(
+			expect(() => expect(casedStatement).not.toSelectDistinctFromTable("table")).toThrow(
 				"expected statement not to select distinct from table.",
 			);
-			expect(() => expect(incorrectStatement).toSelectDistinctFromTable("wrong")).toThrow(
+		});
+
+		itCasing(incorrectStatement, "incorrect negative", (casedStatement) => {
+			// act
+			expect(() => expect(casedStatement).toSelectDistinctFromTable("wrong")).toThrow(
 				"expected statement to select distinct from wrong.",
 			);
-			expect(() => expect(incorrectStatement).toSelectDistinctFromTable("table")).toThrow(
+			expect(() => expect(casedStatement).toSelectDistinctFromTable("table")).toThrow(
 				"expected statement to select distinct from table.",
 			);
 		});
@@ -49,16 +58,18 @@ describe("SqlStatementHelpers", () => {
 	describe("toReplaceIntoTable", () => {
 		const statement = "REPLACE INTO table";
 
-		it("positive", () => {
+		itCasing(statement, "positive", (casedStatement) => {
 			// act
-			expect(statement).toReplaceIntoTable("table");
-			expect(statement).not.toReplaceIntoTable("wrong");
+			expect(casedStatement).toReplaceIntoTable("table");
+			expect(casedStatement).not.toReplaceIntoTable("wrong");
 		});
 
-		it("negative", () => {
+		itCasing(statement, "negative", (casedStatement) => {
 			// act
-			expect(() => expect(statement).toReplaceIntoTable("wrong")).toThrow("expected statement to replace into wrong.");
-			expect(() => expect(statement).not.toReplaceIntoTable("table")).toThrow("expected statement not to replace into table.");
+			expect(() => expect(casedStatement).toReplaceIntoTable("wrong")).toThrow("expected statement to replace into wrong.");
+			expect(() => expect(casedStatement).not.toReplaceIntoTable("table")).toThrow(
+				"expected statement not to replace into table.",
+			);
 		});
 	});
 
@@ -66,28 +77,28 @@ describe("SqlStatementHelpers", () => {
 		const statement = "INSERT INTO table";
 		const replaceStatement = "INSERT OR REPLACE INTO table";
 
-		it("positive", () => {
+		itCasing(statement, "positive", (casedStatement) => {
 			// act
-			expect(statement).toInsertIntoTable("table");
-			expect(statement).not.toInsertIntoTable("wrong");
+			expect(casedStatement).toInsertIntoTable("table");
+			expect(casedStatement).not.toInsertIntoTable("wrong");
 		});
 
-		it("negative", () => {
+		itCasing(statement, "negative", (casedStatement) => {
 			// act
-			expect(() => expect(statement).toInsertIntoTable("wrong")).toThrow("expected statement to insert into wrong.");
-			expect(() => expect(statement).not.toInsertIntoTable("table")).toThrow("expected statement not to insert into table.");
+			expect(() => expect(casedStatement).toInsertIntoTable("wrong")).toThrow("expected statement to insert into wrong.");
+			expect(() => expect(casedStatement).not.toInsertIntoTable("table")).toThrow("expected statement not to insert into table.");
 		});
 
-		it("positive with or option", () => {
+		itCasing(replaceStatement, "positive with or option", (casedStatement) => {
 			// act
-			expect(replaceStatement).toInsertIntoTable("table", { or: "REPLACE" });
-			expect(replaceStatement).not.toInsertIntoTable("table", { or: "FAIL" });
+			expect(casedStatement).toInsertIntoTable("table", { or: "REPLACE" });
+			expect(casedStatement).not.toInsertIntoTable("table", { or: "FAIL" });
 		});
 
-		it("negative with or option", () => {
+		itCasing(replaceStatement, "negative with or option", (casedStatement) => {
 			// act
-			expect(() => expect(replaceStatement).toInsertIntoTable("table")).toThrow("expected statement to insert into table.");
-			expect(() => expect(replaceStatement).not.toInsertIntoTable("table", { or: "REPLACE" })).toThrow(
+			expect(() => expect(casedStatement).toInsertIntoTable("table")).toThrow("expected statement to insert into table.");
+			expect(() => expect(casedStatement).not.toInsertIntoTable("table", { or: "REPLACE" })).toThrow(
 				"expected statement not to insert or replace into table.",
 			);
 		});
@@ -96,48 +107,48 @@ describe("SqlStatementHelpers", () => {
 	describe("toUpdateTable", () => {
 		const statement = "UPDATE table";
 
-		it("positive", () => {
+		itCasing(statement, "positive", (casedStatement) => {
 			// act
-			expect(statement).toUpdateTable("table");
-			expect(statement).not.toUpdateTable("wrong");
+			expect(casedStatement).toUpdateTable("table");
+			expect(casedStatement).not.toUpdateTable("wrong");
 		});
 
-		it("negative", () => {
+		itCasing(statement, "negative", (casedStatement) => {
 			// act
-			expect(() => expect(statement).toUpdateTable("wrong")).toThrow("expected statement to update wrong.");
-			expect(() => expect(statement).not.toUpdateTable("table")).toThrow("expected statement not to update table.");
+			expect(() => expect(casedStatement).toUpdateTable("wrong")).toThrow("expected statement to update wrong.");
+			expect(() => expect(casedStatement).not.toUpdateTable("table")).toThrow("expected statement not to update table.");
 		});
 	});
 
 	describe("toDeleteFromTable", () => {
 		const statement = "DELETE FROM table";
 
-		it("positive", () => {
+		itCasing(statement, "positive", (casedStatement) => {
 			// act
-			expect(statement).toDeleteFromTable("table");
-			expect(statement).not.toDeleteFromTable("wrong");
+			expect(casedStatement).toDeleteFromTable("table");
+			expect(casedStatement).not.toDeleteFromTable("wrong");
 		});
 
-		it("negative", () => {
+		itCasing(statement, "negative", (casedStatement) => {
 			// act
-			expect(() => expect(statement).toDeleteFromTable("wrong")).toThrow("expected statement to delete from wrong.");
-			expect(() => expect(statement).not.toDeleteFromTable("table")).toThrow("expected statement not to delete from table.");
+			expect(() => expect(casedStatement).toDeleteFromTable("wrong")).toThrow("expected statement to delete from wrong.");
+			expect(() => expect(casedStatement).not.toDeleteFromTable("table")).toThrow("expected statement not to delete from table.");
 		});
 	});
 
 	describe("toJoinTable", () => {
 		const statement = "JOIN table";
 
-		it("positive", () => {
+		itCasing(statement, "positive", (casedStatement) => {
 			// act
-			expect(statement).toJoinTable("table");
-			expect(statement).not.toJoinTable("wrong");
+			expect(casedStatement).toJoinTable("table");
+			expect(casedStatement).not.toJoinTable("wrong");
 		});
 
-		it("negative", () => {
+		itCasing(statement, "negative", (casedStatement) => {
 			// act
-			expect(() => expect(statement).toJoinTable("wrong")).toThrow("expected statement to join wrong.");
-			expect(() => expect(statement).not.toJoinTable("table")).toThrow("expected statement not to join table.");
+			expect(() => expect(casedStatement).toJoinTable("wrong")).toThrow("expected statement to join wrong.");
+			expect(() => expect(casedStatement).not.toJoinTable("table")).toThrow("expected statement not to join table.");
 		});
 	});
 
@@ -148,6 +159,7 @@ describe("SqlStatementHelpers", () => {
 		};
 		const positiveStatement = "SELECT id, value FROM table";
 		const negativeStatement = "SELECT id FROM table";
+		const negativeStatementCase = "select ID, VALUE from table";
 		const negativeStatementWhere = "SELECT id FROM table WHERE value = ?";
 
 		it("positive", () => {
@@ -160,6 +172,7 @@ describe("SqlStatementHelpers", () => {
 		it("negative", () => {
 			// act
 			expect(() => expect(negativeStatement).toSelectAllPropertiesOf(Schema)).toThrow("expected column value to be selected.");
+			expect(() => expect(negativeStatementCase).toSelectAllPropertiesOf(Schema)).toThrow("expected column id to be selected.");
 			expect(() => expect(positiveStatement).not.toSelectAllPropertiesOf(Schema)).toThrow(
 				"expected to not select all fields of object.",
 			);
@@ -171,33 +184,46 @@ describe("SqlStatementHelpers", () => {
 		const positiveStatementMultiline = "SELECT\nCOUNT(*)\nFROM table";
 		const negativeStatement = "SELECT id FROM table";
 
-		it("positive", () => {
+		itCasing(positiveStatement, "positive", (casedStatement) => {
 			// act
-			expect(positiveStatement).toSelectCount();
-			expect(positiveStatementMultiline).toSelectCount();
-			expect(negativeStatement).not.toSelectCount();
+			expect(casedStatement).toSelectCount();
 		});
 
-		it("negative", () => {
+		itCasing(positiveStatementMultiline, "positive multiline", (casedStatement) => {
 			// act
-			expect(() => expect(negativeStatement).toSelectCount()).toThrow("expected statement to select COUNT(*).");
+			expect(casedStatement).toSelectCount();
+		});
+
+		itCasing(negativeStatement, "negative positive", (casedStatement) => {
+			// act
+			expect(casedStatement).not.toSelectCount();
+		});
+
+		itCasing(negativeStatement, "negative", (casedStatement) => {
+			// act
+			expect(() => expect(casedStatement).toSelectCount()).toThrow("expected statement to select COUNT(*).");
 			expect(() => expect(positiveStatement).not.toSelectCount()).toThrow("expected statement not to select COUNT(*).");
+		});
+
+		itCasing(positiveStatement, "positive negative", (casedStatement) => {
+			// act
+			expect(() => expect(casedStatement).not.toSelectCount()).toThrow("expected statement not to select COUNT(*).");
 		});
 	});
 
 	describe("toSetColumn", () => {
 		const statement = "UPDATE table SET value = ?";
 
-		it("positive", () => {
+		itCasing(statement, "positive", (casedStatement) => {
 			// act
-			expect(statement).toSetColumn("value");
-			expect(statement).not.toSetColumn("id");
+			expect(casedStatement).toSetColumn("value");
+			expect(casedStatement).not.toSetColumn("id");
 		});
 
-		it("negative", () => {
+		itCasing(statement, "negative", (casedStatement) => {
 			// act
-			expect(() => expect(statement).toSetColumn("id")).toThrow("expected statement to set column id.");
-			expect(() => expect(statement).not.toSetColumn("value")).toThrow("expected statement not to set column value.");
+			expect(() => expect(casedStatement).toSetColumn("id")).toThrow("expected statement to set column id.");
+			expect(() => expect(casedStatement).not.toSetColumn("value")).toThrow("expected statement not to set column value.");
 		});
 	});
 
@@ -205,21 +231,30 @@ describe("SqlStatementHelpers", () => {
 		const positiveStatement = "INSERT INTO table (id) VALUES (1)";
 		const negativeStatement = "SELECT id FROM table";
 
-		it("positive", () => {
+		itCasing(positiveStatement, "positive", (casedStatement) => {
 			// act
-			expect(positiveStatement).toInsertValues();
-			expect(negativeStatement).not.toInsertValues();
+			expect(casedStatement).toInsertValues();
 		});
 
-		it("negative", () => {
+		itCasing(negativeStatement, "negative positive", (casedStatement) => {
 			// act
-			expect(() => expect(negativeStatement).toInsertValues()).toThrow("expected statement to insert values.");
-			expect(() => expect(positiveStatement).not.toInsertValues()).toThrow("expected statement not to insert values.");
+			expect(casedStatement).not.toInsertValues();
+		});
+
+		itCasing(negativeStatement, "negative", (casedStatement) => {
+			// act
+			expect(() => expect(casedStatement).toInsertValues()).toThrow("expected statement to insert values.");
+		});
+
+		itCasing(positiveStatement, "positive negative", (casedStatement) => {
+			// act
+			expect(() => expect(casedStatement).not.toInsertValues()).toThrow("expected statement not to insert values.");
 		});
 	});
 
 	describe("toUseColumnsInCorrectOrder", () => {
 		const statement = "UPDATE table SET id = ?, value = ?";
+		const statementCasing = "update table set ID = ?, VALUE = ?";
 
 		it("positive", () => {
 			// act
@@ -232,6 +267,9 @@ describe("SqlStatementHelpers", () => {
 			expect(() => expect(statement).toUseColumnsInCorrectOrder("value", "id")).toThrow(
 				"expected column id to be used in correct place.",
 			);
+			expect(() => expect(statementCasing).toUseColumnsInCorrectOrder("id", "value")).toThrow(
+				"expected column id to be used in correct place.",
+			);
 			expect(() => expect(statement).not.toUseColumnsInCorrectOrder("id", "value")).toThrow(
 				"expected columns not to be used in correct order.",
 			);
@@ -241,48 +279,57 @@ describe("SqlStatementHelpers", () => {
 	describe("toUseWhereClause", () => {
 		const statement = "SELECT id, value FROM table WHERE id = ?";
 
-		it("positive", () => {
+		itCasing(statement, "positive", (casedStatement) => {
 			// act
-			expect(statement).toUseWhereClause("id = ?");
-			expect(statement).not.toUseWhereClause("value = ?");
+			expect(casedStatement).toUseWhereClause("id = ?");
+			expect(casedStatement).not.toUseWhereClause("value = ?");
 		});
 
-		it("negative", () => {
+		itCasing(statement, "negative", (casedStatement) => {
 			// act
-			expect(() => expect(statement).toUseWhereClause("value = ?")).toThrow("expected statement to use where clause value = ?.");
-			expect(() => expect(statement).not.toUseWhereClause("id = ?")).toThrow("expected statement not use where clause id = ?.");
+			expect(() => expect(casedStatement).toUseWhereClause("value = ?")).toThrow(
+				"expected statement to use where clause value = ?.",
+			);
+			expect(() => expect(casedStatement).not.toUseWhereClause("id = ?")).toThrow(
+				"expected statement not use where clause id = ?.",
+			);
 		});
 	});
 
 	describe("toOrderBy", () => {
 		const statement = "SELECT id, value FROM table GROUP BY value ORDER BY id";
 
-		it("positive", () => {
+		itCasing(statement, "positive", (casedStatement) => {
 			// act
-			expect(statement).toOrderBy("id");
-			expect(statement).not.toOrderBy("value");
+			expect(casedStatement).toOrderBy("id");
+			expect(casedStatement).not.toOrderBy("value");
 		});
 
-		it("negative", () => {
+		itCasing(statement, "negative", (casedStatement) => {
 			// act
-			expect(() => expect(statement).toOrderBy("value")).toThrow("expected statement to order by column value.");
-			expect(() => expect(statement).not.toOrderBy("id")).toThrow("expected statement not to order by column id.");
+			expect(() => expect(casedStatement).toOrderBy("value")).toThrow("expected statement to order by column value.");
+			expect(() => expect(casedStatement).not.toOrderBy("id")).toThrow("expected statement not to order by column id.");
 		});
 	});
 
 	describe("toGroupBy", () => {
 		const statement = "SELECT id, value FROM table GROUP BY id ORDER BY value";
 
-		it("positive", () => {
+		itCasing(statement, "positive", (casedStatement) => {
 			// act
-			expect(statement).toGroupBy("id");
-			expect(statement).not.toGroupBy("value");
+			expect(casedStatement).toGroupBy("id");
+			expect(casedStatement).not.toGroupBy("value");
 		});
 
-		it("negative", () => {
+		itCasing(statement, "negative", (casedStatement) => {
 			// act
-			expect(() => expect(statement).toGroupBy("value")).toThrow("expected statement to group by column value.");
-			expect(() => expect(statement).not.toGroupBy("id")).toThrow("expected statement not to group by column id.");
+			expect(() => expect(casedStatement).toGroupBy("value")).toThrow("expected statement to group by column value.");
+			expect(() => expect(casedStatement).not.toGroupBy("id")).toThrow("expected statement not to group by column id.");
 		});
 	});
 });
+
+function itCasing(statement: string, name: string, callback: (statement: string) => void): void {
+	// eslint-disable-next-line jest/consistent-test-it, jest/require-top-level-describe, jest/expect-expect, jest/valid-title
+	it.each([statement, statement.toUpperCase(), statement.toLowerCase()])(name, callback);
+}

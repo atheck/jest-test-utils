@@ -34,7 +34,7 @@ declare module "expect" {
 
 expect.extend({
 	toSelectFromTable(statement: string, table: string) {
-		const pass = /\bSELECT\b/u.test(statement) && new RegExp(`\\bFROM\\s+${escapeRegExp(table)}\\b`, "u").test(statement);
+		const pass = /\bSELECT\b/iu.test(statement) && new RegExp(`\\bFROM\\s+${escapeRegExp(table)}\\b`, "ui").test(statement);
 
 		return createMatchResult(
 			pass,
@@ -45,7 +45,7 @@ expect.extend({
 
 	toSelectDistinctFromTable(statement: string, table: string) {
 		const pass =
-			/\bSELECT\s+DISTINCT\b/u.test(statement) && new RegExp(`\\bFROM\\s+${escapeRegExp(table)}\\b`, "u").test(statement);
+			/\bSELECT\s+DISTINCT\b/iu.test(statement) && new RegExp(`\\bFROM\\s+${escapeRegExp(table)}\\b`, "ui").test(statement);
 
 		return createMatchResult(
 			pass,
@@ -55,7 +55,7 @@ expect.extend({
 	},
 
 	toReplaceIntoTable(statement: string, table: string) {
-		const pass = new RegExp(`\\bREPLACE\\s+INTO\\s+${escapeRegExp(table)}\\b`, "u").test(statement);
+		const pass = new RegExp(`\\bREPLACE\\s+INTO\\s+${escapeRegExp(table)}\\b`, "iu").test(statement);
 
 		return createMatchResult(
 			pass,
@@ -73,7 +73,7 @@ expect.extend({
 			orMessage = ` or ${options.or.toLowerCase()}`;
 		}
 
-		const pass = new RegExp(`\\bINSERT${orStatement}\\s+INTO\\s+${escapeRegExp(table)}\\b`, "u").test(statement);
+		const pass = new RegExp(`\\bINSERT${orStatement}\\s+INTO\\s+${escapeRegExp(table)}\\b`, "iu").test(statement);
 
 		return createMatchResult(
 			pass,
@@ -83,13 +83,13 @@ expect.extend({
 	},
 
 	toUpdateTable(statement: string, table: string) {
-		const pass = new RegExp(`\\bUPDATE\\s+${escapeRegExp(table)}\\b`, "u").test(statement);
+		const pass = new RegExp(`\\bUPDATE\\s+${escapeRegExp(table)}\\b`, "iu").test(statement);
 
 		return createMatchResult(pass, `expected statement to update ${table}.`, `expected statement not to update ${table}.`);
 	},
 
 	toDeleteFromTable(statement: string, table: string) {
-		const pass = new RegExp(`\\bDELETE\\s+FROM\\s+${escapeRegExp(table)}\\b`, "u").test(statement);
+		const pass = new RegExp(`\\bDELETE\\s+FROM\\s+${escapeRegExp(table)}\\b`, "iu").test(statement);
 
 		return createMatchResult(
 			pass,
@@ -99,7 +99,7 @@ expect.extend({
 	},
 
 	toJoinTable(statement: string, table: string) {
-		const pass = new RegExp(`\\bJOIN\\s+${escapeRegExp(table)}\\b`, "u").test(statement);
+		const pass = new RegExp(`\\bJOIN\\s+${escapeRegExp(table)}\\b`, "iu").test(statement);
 
 		return createMatchResult(pass, `expected statement to join ${table}.`, `expected statement not to join ${table}.`);
 	},
@@ -115,13 +115,13 @@ expect.extend({
 	},
 
 	toSelectCount(statement: string) {
-		const pass = /\bSELECT(?<space>\s|\n)+COUNT\(\*\)/u.test(statement);
+		const pass = /\bSELECT(?<space>\s|\n)+COUNT\(\*\)/iu.test(statement);
 
 		return createMatchResult(pass, "expected statement to select COUNT(*).", "expected statement not to select COUNT(*).");
 	},
 
 	toSetColumn(statement: string, column: string, value?: string) {
-		const pass = new RegExp(`\\bSET\\b(.|\\n)+${escapeRegExp(column)}\\s*=\\s*${escapeRegExp(value ?? "?")}`, "u").test(
+		const pass = new RegExp(`\\bSET\\b(.|\\n)+${escapeRegExp(column)}\\s*=\\s*${escapeRegExp(value ?? "?")}`, "iu").test(
 			statement,
 		);
 
@@ -133,7 +133,7 @@ expect.extend({
 	},
 
 	toInsertValues(statement: string) {
-		const pass = /\bVALUES\s+\(/u.test(statement);
+		const pass = /\bVALUES\s+\(/iu.test(statement);
 
 		return createMatchResult(pass, "expected statement to insert values.", "expected statement not to insert values.");
 	},
@@ -163,7 +163,7 @@ expect.extend({
 	},
 
 	toUseWhereClause(statement: string, comparison: string) {
-		const pass = new RegExp(`\\bWHERE\\b(.|\\n)+${escapeRegExp(comparison)}`, "u").test(statement);
+		const pass = new RegExp(`\\bWHERE\\b(.|\\n)+${escapeRegExp(comparison)}`, "iu").test(statement);
 
 		return createMatchResult(
 			pass,
@@ -173,7 +173,7 @@ expect.extend({
 	},
 
 	toOrderBy(statement: string, column: string) {
-		const pass = new RegExp(`\\bORDER\\s+BY\\b(\\s|,|\\n)+${escapeRegExp(column)}`, "u").test(statement);
+		const pass = new RegExp(`\\bORDER\\s+BY\\b(\\s|,|\\n)+${escapeRegExp(column)}`, "iu").test(statement);
 
 		return createMatchResult(
 			pass,
@@ -183,7 +183,7 @@ expect.extend({
 	},
 
 	toGroupBy(statement: string, column: string) {
-		const pass = new RegExp(`\\bGROUP\\s+BY\\b(\\s|,|\\n)+${escapeRegExp(column)}`, "u").test(statement);
+		const pass = new RegExp(`\\bGROUP\\s+BY\\b(\\s|,|\\n)+${escapeRegExp(column)}`, "iu").test(statement);
 
 		return createMatchResult(
 			pass,
@@ -211,7 +211,7 @@ function verifySelectsAllColumns(statement: string, ...fields: string[]): string
 }
 
 function escapeRegExp(value: string): string {
-	return value.replaceAll(/[.*+?^${}()|[\]\\]/gu, "\\$&");
+	return value.replaceAll(/[.*+?^${}()|[\]\\]/giu, "\\$&");
 }
 
 function findColumn(statement: string, field: string): RegExpExecArray | null {
