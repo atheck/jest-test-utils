@@ -25,11 +25,25 @@ interface InsertOptions {
 
 declare module "expect" {
 	/* eslint-disable @typescript-eslint/naming-convention */
-	// biome-ignore lint/correctness/noUnusedVariables: <explanation>
+	// biome-ignore lint/correctness/noUnusedVariables: Needs to be present.
 	interface Matchers<R extends void | Promise<void>, T = unknown> extends SqlStatementMatchers<R> {}
 	/* eslint-enable @typescript-eslint/naming-convention */
 
 	interface InverseAsymmetricMatchers extends SqlStatementMatchers {}
+}
+
+declare global {
+	// biome-ignore lint/style/noNamespace: We want it to work the old way too.
+	namespace jest {
+		interface Expect extends SqlStatementMatchers {}
+
+		/* eslint-disable @typescript-eslint/naming-convention */
+		// biome-ignore lint/correctness/noUnusedVariables: Needs to be present.
+		interface Matchers<R extends void | Promise<void>, T = unknown> extends SqlStatementMatchers<R> {}
+		/* eslint-enable @typescript-eslint/naming-convention */
+
+		interface InverseAsymmetricMatchers extends SqlStatementMatchers {}
+	}
 }
 
 expect.extend({
