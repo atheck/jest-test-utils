@@ -1,3 +1,5 @@
 {
-    "extends": "heck/node"
+    "extends": [
+        "heck/nodeWithBiome"
+    ]
 }

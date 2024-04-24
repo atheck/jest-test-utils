@@ -1,8 +1,8 @@
-"use strict";
+/* eslint-disable strict */
 
 module.exports = {
-    preset: "ts-jest",
-    testEnvironment: "node",
-    setupFilesAfterEnv: ["./tests/setupTests.ts"],
-    collectCoverageFrom: ["src/**/*.{ts,tsx}"],
+	preset: "ts-jest",
+	testEnvironment: "node",
+	setupFilesAfterEnv: ["./tests/setupTests.ts"],
+	collectCoverageFrom: ["src/**/*.{ts,tsx}"],
 };

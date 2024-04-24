@@ -1,0 +1,25 @@
+{
+  "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
+  "extends": [
+    "eslint-config-heck/biome"
+  ],
+  "linter": {
+    "rules": {
+      "nursery": {
+        "useImportRestrictions": "off",
+        "noMisplacedAssertion": "off"
+      }
+    }
+  },
+  "organizeImports": {
+    "enabled": false
+  },
+  "formatter": {
+    "lineWidth": 130
+  },
+  "json": {
+    "parser": {
+      "allowComments": true
+    }
+  }
+}
