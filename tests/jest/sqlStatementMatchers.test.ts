@@ -157,7 +157,7 @@ describe("SqlStatementHelpers", () => {
 			id: "id",
 			value: "value",
 		};
-		const positiveStatement = "SELECT id, value FROM table";
+		const positiveStatement = "SELECT id, value FROM\ntable";
 		const negativeStatement = "SELECT id FROM table";
 		const negativeStatementCase = "select ID, VALUE from table";
 		const negativeStatementWhere = "SELECT id FROM table WHERE value = ?";

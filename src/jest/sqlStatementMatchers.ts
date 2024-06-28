@@ -208,7 +208,7 @@ expect.extend({
 });
 
 function verifySelectsAllColumns(statement: string, ...fields: string[]): string | null {
-	const fromIndex = statement.indexOf("FROM ");
+	const fromIndex = statement.search(/\bFROM\b/u);
 
 	for (const field of fields) {
 		const match = findColumn(statement, field);
