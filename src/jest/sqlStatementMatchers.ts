@@ -46,8 +46,6 @@ declare global {
 
 const selectRegex = /\bSELECT\b/iu;
 const selectDistinctRegex = /\bSELECT\s+DISTINCT\b/iu;
-const onConflictRegex = /\bON\s+CONFLICT\b/iu;
-const doUpdateSetRegex = /\bDO\s+UPDATE\s+SET\b/iu;
 const selectCountRegex = /\bSELECT(?<space>\s|\n)+COUNT\(\*\)/iu;
 const valuesRegex = /\bVALUES\s+\(/iu;
 const fromRegex = /\bFROM\b/u;
