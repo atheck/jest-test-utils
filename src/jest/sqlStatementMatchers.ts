@@ -24,10 +24,9 @@ interface InsertOptions {
 }
 
 declare module "expect" {
-	/* eslint-disable @typescript-eslint/naming-convention */
 	// biome-ignore lint/correctness/noUnusedVariables: Needs to be present.
+	// biome-ignore lint/style/useNamingConvention: This needs to be named this way.
 	interface Matchers<R extends void | Promise<void>, T = unknown> extends SqlStatementMatchers<R> {}
-	/* eslint-enable @typescript-eslint/naming-convention */
 
 	interface InverseAsymmetricMatchers extends SqlStatementMatchers {}
 }
@@ -37,18 +36,25 @@ declare global {
 	namespace jest {
 		interface Expect extends SqlStatementMatchers {}
 
-		/* eslint-disable @typescript-eslint/naming-convention */
 		// biome-ignore lint/correctness/noUnusedVariables: Needs to be present.
+		// biome-ignore lint/style/useNamingConvention: This needs to be named this way.
 		interface Matchers<R extends void | Promise<void>, T = unknown> extends SqlStatementMatchers<R> {}
-		/* eslint-enable @typescript-eslint/naming-convention */
 
 		interface InverseAsymmetricMatchers extends SqlStatementMatchers {}
 	}
 }
 
+const selectRegex = /\bSELECT\b/iu;
+const selectDistinctRegex = /\bSELECT\s+DISTINCT\b/iu;
+const onConflictRegex = /\bON\s+CONFLICT\b/iu;
+const doUpdateSetRegex = /\bDO\s+UPDATE\s+SET\b/iu;
+const selectCountRegex = /\bSELECT(?<space>\s|\n)+COUNT\(\*\)/iu;
+const valuesRegex = /\bVALUES\s+\(/iu;
+const fromRegex = /\bFROM\b/u;
+
 expect.extend({
 	toSelectFromTable(statement: string, table: string) {
-		const pass = /\bSELECT\b/iu.test(statement) && new RegExp(`\\bFROM\\s+${escapeRegExp(table)}\\b`, "ui").test(statement);
+		const pass = selectRegex.test(statement) && new RegExp(`\\bFROM\\s+${escapeRegExp(table)}\\b`, "ui").test(statement);
 
 		return createMatchResult(
 			pass,
@@ -58,8 +64,7 @@ expect.extend({
 	},
 
 	toSelectDistinctFromTable(statement: string, table: string) {
-		const pass =
-			/\bSELECT\s+DISTINCT\b/iu.test(statement) && new RegExp(`\\bFROM\\s+${escapeRegExp(table)}\\b`, "ui").test(statement);
+		const pass = selectDistinctRegex.test(statement) && new RegExp(`\\bFROM\\s+${escapeRegExp(table)}\\b`, "ui").test(statement);
 
 		return createMatchResult(
 			pass,
@@ -129,7 +134,7 @@ expect.extend({
 	},
 
 	toSelectCount(statement: string) {
-		const pass = /\bSELECT(?<space>\s|\n)+COUNT\(\*\)/iu.test(statement);
+		const pass = selectCountRegex.test(statement);
 
 		return createMatchResult(pass, "expected statement to select COUNT(*).", "expected statement not to select COUNT(*).");
 	},
@@ -147,7 +152,7 @@ expect.extend({
 	},
 
 	toInsertValues(statement: string) {
-		const pass = /\bVALUES\s+\(/iu.test(statement);
+		const pass = valuesRegex.test(statement);
 
 		return createMatchResult(pass, "expected statement to insert values.", "expected statement not to insert values.");
 	},
@@ -208,7 +213,7 @@ expect.extend({
 });
 
 function verifySelectsAllColumns(statement: string, ...fields: string[]): string | null {
-	const fromIndex = statement.search(/\bFROM\b/u);
+	const fromIndex = statement.search(fromRegex);
 
 	for (const field of fields) {
 		const match = findColumn(statement, field);
