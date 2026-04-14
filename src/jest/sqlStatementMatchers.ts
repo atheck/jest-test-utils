@@ -88,7 +88,6 @@ expect.extend({
 		);
 	},
 
-	// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: no finished yet
 	toInsertIntoTable(statement: string, table: string, options?: InsertOptions) {
 		let orStatement = "";
 		let orMessage = "";
