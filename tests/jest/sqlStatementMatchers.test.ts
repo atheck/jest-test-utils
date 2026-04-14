@@ -74,33 +74,125 @@ describe("SqlStatementHelpers", () => {
 	});
 
 	describe("toInsertIntoTable", () => {
-		const statement = "INSERT INTO table";
-		const replaceStatement = "INSERT OR REPLACE INTO table";
+		describe("simple", () => {
+			const statement = "INSERT INTO table";
 
-		itCasing(statement, "positive", (casedStatement) => {
-			// act
-			expect(casedStatement).toInsertIntoTable("table");
-			expect(casedStatement).not.toInsertIntoTable("wrong");
+			itCasing(statement, "positive", (casedStatement) => {
+				// act
+				expect(casedStatement).toInsertIntoTable("table");
+				expect(casedStatement).not.toInsertIntoTable("wrong");
+			});
+
+			itCasing(statement, "negative", (casedStatement) => {
+				// act
+				expect(() => expect(casedStatement).toInsertIntoTable("wrong")).toThrow("expected statement to insert into wrong.");
+				expect(() => expect(casedStatement).not.toInsertIntoTable("table")).toThrow(
+					"expected statement not to insert into table.",
+				);
+			});
 		});
 
-		itCasing(statement, "negative", (casedStatement) => {
-			// act
-			expect(() => expect(casedStatement).toInsertIntoTable("wrong")).toThrow("expected statement to insert into wrong.");
-			expect(() => expect(casedStatement).not.toInsertIntoTable("table")).toThrow("expected statement not to insert into table.");
+		describe("with or option", () => {
+			const statement = "INSERT OR REPLACE INTO table";
+
+			itCasing(statement, "positive with or option", (casedStatement) => {
+				// act
+				expect(casedStatement).toInsertIntoTable("table", { or: "REPLACE" });
+				expect(casedStatement).not.toInsertIntoTable("table", { or: "FAIL" });
+			});
+
+			itCasing(statement, "negative with or option", (casedStatement) => {
+				// act
+				expect(() => expect(casedStatement).toInsertIntoTable("table")).toThrow("expected statement to insert into table.");
+				expect(() => expect(casedStatement).not.toInsertIntoTable("table", { or: "REPLACE" })).toThrow(
+					"expected statement not to insert or replace into table.",
+				);
+			});
 		});
 
-		itCasing(replaceStatement, "positive with or option", (casedStatement) => {
-			// act
-			expect(casedStatement).toInsertIntoTable("table", { or: "REPLACE" });
-			expect(casedStatement).not.toInsertIntoTable("table", { or: "FAIL" });
+		describe("with columns option", () => {
+			const statement = "INSERT INTO table (id, value)";
+
+			itCasing(statement, "positive with columns option", (casedStatement) => {
+				// act
+				expect(casedStatement).toInsertIntoTable("table", { columns: ["id", "value"] });
+				expect(casedStatement).not.toInsertIntoTable("table", { columns: ["value", "id"] });
+			});
+
+			itCasing(statement, "negative with columns option", (casedStatement) => {
+				// act
+				expect(() => expect(casedStatement).toInsertIntoTable("table", { columns: ["value", "id"] })).toThrow(
+					"expected statement to insert into table, using columns value, id.",
+				);
+				expect(() => expect(casedStatement).not.toInsertIntoTable("table", { columns: ["id", "value"] })).toThrow(
+					"expected statement not to insert into table, using columns id, value.",
+				);
+			});
 		});
 
-		itCasing(replaceStatement, "negative with or option", (casedStatement) => {
-			// act
-			expect(() => expect(casedStatement).toInsertIntoTable("table")).toThrow("expected statement to insert into table.");
-			expect(() => expect(casedStatement).not.toInsertIntoTable("table", { or: "REPLACE" })).toThrow(
-				"expected statement not to insert or replace into table.",
-			);
+		describe("with onConflict option", () => {
+			const statement = "INSERT INTO table (id, value) ON CONFLICT (id) DO UPDATE SET value = excluded.value";
+			const withoutConflictStatement = "INSERT INTO table (id, value)";
+
+			itCasing(statement, "positive with onConflict option", (casedStatement) => {
+				// act
+				expect(casedStatement).toInsertIntoTable("table", { onConflict: { keys: ["id"], updateSet: true } });
+				expect(casedStatement).not.toInsertIntoTable("table", { onConflict: { keys: ["value", "id"] } });
+			});
+
+			itCasing(withoutConflictStatement, "positive with onConflict option", (casedStatement) => {
+				// act
+				expect(casedStatement).not.toInsertIntoTable("table", { onConflict: { keys: ["value", "id"], updateSet: true } });
+			});
+
+			itCasing(statement, "negative with onConflict option", (casedStatement) => {
+				// act
+				expect(() =>
+					expect(casedStatement).toInsertIntoTable("table", { onConflict: { keys: ["value", "id"], updateSet: true } }),
+				).toThrow("expected statement to insert into table, using conflict clause with columns value, id.");
+				expect(() =>
+					expect(casedStatement).not.toInsertIntoTable("table", { onConflict: { keys: ["id", "value"], updateSet: true } }),
+				).toThrow("expected statement not to insert into table, using conflict clause with columns id, value.");
+			});
+
+			itCasing(withoutConflictStatement, "negative with onConflict option", (casedStatement) => {
+				// act
+				expect(() =>
+					expect(casedStatement).toInsertIntoTable("table", { onConflict: { keys: ["value", "id"], updateSet: true } }),
+				).toThrow("expected statement to insert into table, using conflict clause with columns value, id.");
+			});
+		});
+
+		describe("with onConflict and columns option", () => {
+			const statement = "INSERT INTO table (id, value) ON CONFLICT (id) DO UPDATE SET value = excluded.value";
+
+			itCasing(statement, "positive with onConflict and columns option", (casedStatement) => {
+				// act
+				expect(casedStatement).toInsertIntoTable("table", {
+					onConflict: { keys: ["id"], updateSet: true },
+					columns: ["id", "value"],
+				});
+				expect(casedStatement).not.toInsertIntoTable("table", {
+					onConflict: { keys: ["value", "id"] },
+					columns: ["id", "value"],
+				});
+			});
+
+			itCasing(statement, "negative with onConflict and columns option", (casedStatement) => {
+				// act
+				expect(() =>
+					expect(casedStatement).toInsertIntoTable("table", {
+						onConflict: { keys: ["id"], updateSet: true },
+						columns: ["id", "other"],
+					}),
+				).toThrow("expected statement to insert into table, using columns id, other, using conflict clause with columns id.");
+				expect(() =>
+					expect(casedStatement).not.toInsertIntoTable("table", {
+						onConflict: { keys: ["id"], updateSet: true },
+						columns: ["id", "value"],
+					}),
+				).toThrow("expected statement not to insert into table, using columns id, value, using conflict clause with columns id.");
+			});
 		});
 	});
 
@@ -267,7 +359,7 @@ describe("SqlStatementHelpers", () => {
 			expect(() => expect(statement).toUseColumnsInCorrectOrder("value", "id")).toThrow(
 				"expected column id to be used in correct place.",
 			);
-			expect(() => expect(statementCasing).toUseColumnsInCorrectOrder("id", "value")).toThrow(
+			expect(() => expect(statementCasing).toUseColumnsInCorrectOrder("value", "id")).toThrow(
 				"expected column id to be used in correct place.",
 			);
 			expect(() => expect(statement).not.toUseColumnsInCorrectOrder("id", "value")).toThrow(

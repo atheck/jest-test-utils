@@ -1,4 +1,5 @@
 import { expect } from "@jest/globals";
+// biome-ignore lint/correctness/noUndeclaredDependencies: Is installed with jest.
 import type { SyncExpectationResult } from "expect";
 
 interface SqlStatementMatchers<TResult = unknown> {
@@ -20,11 +21,15 @@ interface SqlStatementMatchers<TResult = unknown> {
 }
 
 interface InsertOptions {
-	or: "ABORT" | "FAIL" | "IGNORE" | "REPLACE" | "ROLLBACK";
+	or?: "ABORT" | "FAIL" | "IGNORE" | "REPLACE" | "ROLLBACK";
+	columns?: string[];
+	onConflict?: {
+		keys: string[];
+		updateSet?: boolean;
+	};
 }
 
 declare module "expect" {
-	// biome-ignore lint/correctness/noUnusedVariables: Needs to be present.
 	// biome-ignore lint/style/useNamingConvention: This needs to be named this way.
 	interface Matchers<R extends void | Promise<void>, T = unknown> extends SqlStatementMatchers<R> {}
 
@@ -36,7 +41,6 @@ declare global {
 	namespace jest {
 		interface Expect extends SqlStatementMatchers {}
 
-		// biome-ignore lint/correctness/noUnusedVariables: Needs to be present.
 		// biome-ignore lint/style/useNamingConvention: This needs to be named this way.
 		interface Matchers<R extends void | Promise<void>, T = unknown> extends SqlStatementMatchers<R> {}
 
@@ -46,13 +50,15 @@ declare global {
 
 const selectRegex = /\bSELECT\b/iu;
 const selectDistinctRegex = /\bSELECT\s+DISTINCT\b/iu;
+const onConflictRegex = /\bON\s+CONFLICT\b/iu;
+const doUpdateSetRegex = /\bDO\s+UPDATE\s+SET\b/iu;
 const selectCountRegex = /\bSELECT(?<space>\s|\n)+COUNT\(\*\)/iu;
 const valuesRegex = /\bVALUES\s+\(/iu;
 const fromRegex = /\bFROM\b/u;
 
 expect.extend({
 	toSelectFromTable(statement: string, table: string) {
-		const pass = selectRegex.test(statement) && new RegExp(`\\bFROM\\s+${escapeRegExp(table)}\\b`, "ui").test(statement);
+		const pass = selectRegex.test(statement) && new RegExp(String.raw`\bFROM\s+${escapeRegExp(table)}\b`, "ui").test(statement);
 
 		return createMatchResult(
 			pass,
@@ -62,7 +68,8 @@ expect.extend({
 	},
 
 	toSelectDistinctFromTable(statement: string, table: string) {
-		const pass = selectDistinctRegex.test(statement) && new RegExp(`\\bFROM\\s+${escapeRegExp(table)}\\b`, "ui").test(statement);
+		const pass =
+			selectDistinctRegex.test(statement) && new RegExp(String.raw`\bFROM\s+${escapeRegExp(table)}\b`, "ui").test(statement);
 
 		return createMatchResult(
 			pass,
@@ -72,7 +79,7 @@ expect.extend({
 	},
 
 	toReplaceIntoTable(statement: string, table: string) {
-		const pass = new RegExp(`\\bREPLACE\\s+INTO\\s+${escapeRegExp(table)}\\b`, "iu").test(statement);
+		const pass = new RegExp(String.raw`\bREPLACE\s+INTO\s+${escapeRegExp(table)}\b`, "iu").test(statement);
 
 		return createMatchResult(
 			pass,
@@ -81,32 +88,105 @@ expect.extend({
 		);
 	},
 
+	// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: no finished yet
 	toInsertIntoTable(statement: string, table: string, options?: InsertOptions) {
 		let orStatement = "";
 		let orMessage = "";
+		let columnsMessage = "";
+		let conflictMessage = "";
 
 		if (options?.or) {
-			orStatement = `\\s+OR\\s+${options.or}`;
+			orStatement = String.raw`\s+OR\s+${options.or}`;
 			orMessage = ` or ${options.or.toLowerCase()}`;
 		}
 
-		const pass = new RegExp(`\\bINSERT${orStatement}\\s+INTO\\s+${escapeRegExp(table)}\\b`, "iu").test(statement);
+		let pass = new RegExp(String.raw`\bINSERT${orStatement}\s+INTO\s+${escapeRegExp(table)}\b`, "iu").test(statement);
+
+		const onConflictIndex = statement.search(onConflictRegex);
+
+		if (options?.onConflict) {
+			conflictMessage = `, using conflict clause with columns ${options.onConflict.keys.join(", ")}`;
+
+			if (onConflictIndex === -1) {
+				pass = false;
+			}
+
+			let statementPart = statement.slice(onConflictIndex);
+
+			for (const column of options.onConflict.keys) {
+				const matches = findColumn(statementPart, column);
+
+				if (!matches) {
+					pass = false;
+
+					continue;
+				}
+
+				statementPart = statementPart.slice(Math.max(0, matches.index + matches.length));
+			}
+
+			if (options.onConflict.updateSet) {
+				if (!doUpdateSetRegex.test(statement.slice(onConflictIndex))) {
+					pass = false;
+				}
+
+				const remainingColumns = new Set(options.columns);
+
+				for (const column of options.onConflict.keys) {
+					remainingColumns.delete(column);
+				}
+
+				for (const column of remainingColumns) {
+					const matches = findColumn(statementPart, column);
+
+					if (!matches) {
+						pass = false;
+
+						continue;
+					}
+
+					statementPart = statementPart.slice(Math.max(0, matches.index + matches.length));
+				}
+			}
+		}
+
+		if (options?.columns) {
+			columnsMessage = `, using columns ${options.columns.join(", ")}`;
+
+			let statementPart = statement;
+
+			if (options.onConflict) {
+				statementPart = statementPart.slice(0, onConflictIndex);
+			}
+
+			for (const column of options.columns) {
+				const matches = findColumn(statementPart, column);
+
+				if (!matches) {
+					pass = false;
+
+					continue;
+				}
+
+				statementPart = statementPart.slice(Math.max(0, matches.index + matches.length));
+			}
+		}
 
 		return createMatchResult(
 			pass,
-			`expected statement to insert${orMessage} into ${table}.`,
-			`expected statement not to insert${orMessage} into ${table}.`,
+			`expected statement to insert${orMessage} into ${table}${columnsMessage}${conflictMessage}.`,
+			`expected statement not to insert${orMessage} into ${table}${columnsMessage}${conflictMessage}.`,
 		);
 	},
 
 	toUpdateTable(statement: string, table: string) {
-		const pass = new RegExp(`\\bUPDATE\\s+${escapeRegExp(table)}\\b`, "iu").test(statement);
+		const pass = new RegExp(String.raw`\bUPDATE\s+${escapeRegExp(table)}\b`, "iu").test(statement);
 
 		return createMatchResult(pass, `expected statement to update ${table}.`, `expected statement not to update ${table}.`);
 	},
 
 	toDeleteFromTable(statement: string, table: string) {
-		const pass = new RegExp(`\\bDELETE\\s+FROM\\s+${escapeRegExp(table)}\\b`, "iu").test(statement);
+		const pass = new RegExp(String.raw`\bDELETE\s+FROM\s+${escapeRegExp(table)}\b`, "iu").test(statement);
 
 		return createMatchResult(
 			pass,
@@ -116,7 +196,7 @@ expect.extend({
 	},
 
 	toJoinTable(statement: string, table: string) {
-		const pass = new RegExp(`\\bJOIN\\s+${escapeRegExp(table)}\\b`, "iu").test(statement);
+		const pass = new RegExp(String.raw`\bJOIN\s+${escapeRegExp(table)}\b`, "iu").test(statement);
 
 		return createMatchResult(pass, `expected statement to join ${table}.`, `expected statement not to join ${table}.`);
 	},
@@ -138,7 +218,7 @@ expect.extend({
 	},
 
 	toSetColumn(statement: string, column: string, value?: string) {
-		const pass = new RegExp(`\\bSET\\b(.|\\n)+${escapeRegExp(column)}\\s*=\\s*${escapeRegExp(value ?? "?")}`, "iu").test(
+		const pass = new RegExp(String.raw`\bSET\b(.|\n)+${escapeRegExp(column)}\s*=\s*${escapeRegExp(value ?? "?")}`, "iu").test(
 			statement,
 		);
 
@@ -180,7 +260,7 @@ expect.extend({
 	},
 
 	toUseWhereClause(statement: string, comparison: string) {
-		const pass = new RegExp(`\\bWHERE\\b(.|\\n)+${escapeRegExp(comparison)}`, "iu").test(statement);
+		const pass = new RegExp(String.raw`\bWHERE\b(.|\n)+${escapeRegExp(comparison)}`, "iu").test(statement);
 
 		return createMatchResult(
 			pass,
@@ -190,7 +270,7 @@ expect.extend({
 	},
 
 	toOrderBy(statement: string, column: string) {
-		const pass = new RegExp(`\\bORDER\\s+BY\\b(\\s|,|\\n)+${escapeRegExp(column)}`, "iu").test(statement);
+		const pass = new RegExp(String.raw`\bORDER\s+BY\b(\s|,|\n)+${escapeRegExp(column)}`, "iu").test(statement);
 
 		return createMatchResult(
 			pass,
@@ -200,7 +280,7 @@ expect.extend({
 	},
 
 	toGroupBy(statement: string, column: string) {
-		const pass = new RegExp(`\\bGROUP\\s+BY\\b(\\s|,|\\n)+${escapeRegExp(column)}`, "iu").test(statement);
+		const pass = new RegExp(String.raw`\bGROUP\s+BY\b(\s|,|\n)+${escapeRegExp(column)}`, "iu").test(statement);
 
 		return createMatchResult(
 			pass,
@@ -228,11 +308,11 @@ function verifySelectsAllColumns(statement: string, ...fields: string[]): string
 }
 
 function escapeRegExp(value: string): string {
-	return value.replaceAll(/[.*+?^${}()|[\]\\]/giu, "\\$&");
+	return value.replaceAll(/[.*+?^${}()|[\]\\]/giu, String.raw`\$&`);
 }
 
 function findColumn(statement: string, field: string): RegExpExecArray | null {
-	const fieldRegex = new RegExp(`\\b${escapeRegExp(field)}\\b`, "u");
+	const fieldRegex = new RegExp(String.raw`\b${escapeRegExp(field)}\b`, "iu");
 	const matches = fieldRegex.exec(statement);
 
 	return matches;

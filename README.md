@@ -28,7 +28,7 @@ Add this to your jest config to extend jest `expect` with [SQL statement matcher
 | `toSelectFromTable` | Verify that the sql statement selects from the specified table. |
 | `toSelectDistinctFromTable` | Verify that the sql statement selects distinct values from the specified table. |
 | `toReplaceIntoTable` | Verify that the sql statement replaces into the specified table. |
-| `toInsertIntoTable` | Verify that the sql statement inserts into the specified table. In the optional options object you can specify an `OR` action. |
+| `toInsertIntoTable` | Verify that the sql statement inserts into the specified table. In the optional options object you can specify an `OR` action, the columns in the correct order to be set, and columns used in an `ON CONFLICT` clause. |
 | `toUpdateTable` | Verify that the sql statement updates the specified table. |
 | `toDeleteFromTable` | Verify that the sql statement deletes from the specified table. |
 | `toJoinTable` | Verify that the sql statement joins another table. |
@@ -39,6 +39,28 @@ Add this to your jest config to extend jest `expect` with [SQL statement matcher
 | `toUseWhereClause` | Verify that the sql statement uses the specified where clause. |
 | `toOrderBy` | Verify that the sql statement orders by the specified column. |
 | `toGroupBy` | Verify that the sql statement groups the result by the specified column. |
+
+#### toInsertIntoTable
+
+This function can be used to verify that an SQL statement inserts into a table. The following example checks if the SQL statement inserts into the table `table` setting the columns `column1` and `column2` in the correct order and uses the `column1` in an `ON CONFLICT` clause and still setting `column2`.
+
+```ts
+expect(`
+    INSERT INTO table (
+        column1
+        , column2
+    )
+    VALUES (value1, value2)
+    ON CONFLICT (column1) DO UPDATE SET
+        column2 = excluded.column2
+`).toInsertIntoTable('table', {
+    columns: ['column1', 'column2'],
+    onConflict: {
+        keys: ['column1'],
+        updateSet: true,
+    },
+});
+```
 
 ### manyOf
 
