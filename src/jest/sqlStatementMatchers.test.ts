@@ -16,42 +16,42 @@ describe("SqlStatementHelpers", () => {
 			expect(() => expect(casedStatement).toSelectFromTable("wrong")).toThrow("expected statement to select from wrong.");
 			expect(() => expect(casedStatement).not.toSelectFromTable("table")).toThrow("expected statement not to select from table.");
 		});
-	});
 
-	describe("toSelectDistinctFromTable", () => {
-		const correctStatement = "SELECT DISTINCT FROM table";
-		const incorrectStatement = "SELECT FROM table";
+		describe("with distinct option", () => {
+			const correctStatement = "SELECT DISTINCT FROM table";
+			const incorrectStatement = "SELECT FROM table";
 
-		itCasing(correctStatement, "correct positive", (casedStatement) => {
-			// act
-			expect(casedStatement).toSelectDistinctFromTable("table");
-			expect(casedStatement).not.toSelectDistinctFromTable("wrong");
-		});
+			itCasing(correctStatement, "correct positive", (casedStatement) => {
+				// act
+				expect(casedStatement).toSelectFromTable("table", { distinct: true });
+				expect(casedStatement).not.toSelectFromTable("wrong", { distinct: true });
+			});
 
-		itCasing(incorrectStatement, "incorrect positive", (casedStatement) => {
-			// act
-			expect(casedStatement).not.toSelectDistinctFromTable("table");
-			expect(casedStatement).not.toSelectDistinctFromTable("wrong");
-		});
+			itCasing(incorrectStatement, "incorrect positive", (casedStatement) => {
+				// act
+				expect(casedStatement).not.toSelectFromTable("table", { distinct: true });
+				expect(casedStatement).not.toSelectFromTable("wrong", { distinct: true });
+			});
 
-		itCasing(correctStatement, "correct negative", (casedStatement) => {
-			// act
-			expect(() => expect(casedStatement).toSelectDistinctFromTable("wrong")).toThrow(
-				"expected statement to select distinct from wrong.",
-			);
-			expect(() => expect(casedStatement).not.toSelectDistinctFromTable("table")).toThrow(
-				"expected statement not to select distinct from table.",
-			);
-		});
+			itCasing(correctStatement, "correct negative", (casedStatement) => {
+				// act
+				expect(() => expect(casedStatement).toSelectFromTable("wrong", { distinct: true })).toThrow(
+					"expected statement to select distinct from wrong.",
+				);
+				expect(() => expect(casedStatement).not.toSelectFromTable("table", { distinct: true })).toThrow(
+					"expected statement not to select distinct from table.",
+				);
+			});
 
-		itCasing(incorrectStatement, "incorrect negative", (casedStatement) => {
-			// act
-			expect(() => expect(casedStatement).toSelectDistinctFromTable("wrong")).toThrow(
-				"expected statement to select distinct from wrong.",
-			);
-			expect(() => expect(casedStatement).toSelectDistinctFromTable("table")).toThrow(
-				"expected statement to select distinct from table.",
-			);
+			itCasing(incorrectStatement, "incorrect negative", (casedStatement) => {
+				// act
+				expect(() => expect(casedStatement).toSelectFromTable("wrong", { distinct: true })).toThrow(
+					"expected statement to select distinct from wrong.",
+				);
+				expect(() => expect(casedStatement).toSelectFromTable("table", { distinct: true })).toThrow(
+					"expected statement to select distinct from table.",
+				);
+			});
 		});
 	});
 

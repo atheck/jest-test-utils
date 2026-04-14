@@ -25,8 +25,7 @@ Add this to your jest config to extend jest `expect` with [SQL statement matcher
 
 | function | description |
 | --- | --- |
-| `toSelectFromTable` | Verify that the sql statement selects from the specified table. |
-| `toSelectDistinctFromTable` | Verify that the sql statement selects distinct values from the specified table. |
+| `toSelectFromTable` | Verify that the sql statement selects from the specified table. Pass `{ distinct: true }` to verify a `SELECT DISTINCT` statement. |
 | `toReplaceIntoTable` | Verify that the sql statement replaces into the specified table. |
 | `toInsertIntoTable` | Verify that the sql statement inserts into the specified table. In the optional options object you can specify an `OR` action, the columns in the correct order to be set, and columns used in an `ON CONFLICT` clause. |
 | `toUpdateTable` | Verify that the sql statement updates the specified table. |

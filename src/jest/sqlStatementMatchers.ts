@@ -2,9 +2,12 @@ import { expect } from "@jest/globals";
 // biome-ignore lint/correctness/noUndeclaredDependencies: Is installed with jest.
 import type { SyncExpectationResult } from "expect";
 
+interface SelectOptions {
+	distinct?: boolean;
+}
+
 interface SqlStatementMatchers<TResult = unknown> {
-	toSelectFromTable: (table: string) => TResult;
-	toSelectDistinctFromTable: (table: string) => TResult;
+	toSelectFromTable: (table: string, options?: SelectOptions) => TResult;
 	toReplaceIntoTable: (table: string) => TResult;
 	toInsertIntoTable: (table: string, options?: InsertOptions) => TResult;
 	toUpdateTable: (table: string) => TResult;
@@ -57,24 +60,17 @@ const valuesRegex = /\bVALUES\s+\(/iu;
 const fromRegex = /\bFROM\b/u;
 
 expect.extend({
-	toSelectFromTable(statement: string, table: string) {
-		const pass = selectRegex.test(statement) && new RegExp(String.raw`\bFROM\s+${escapeRegExp(table)}\b`, "ui").test(statement);
-
-		return createMatchResult(
-			pass,
-			`expected statement to select from ${table}.`,
-			`expected statement not to select from ${table}.`,
-		);
-	},
-
-	toSelectDistinctFromTable(statement: string, table: string) {
+	toSelectFromTable(statement: string, table: string, options?: SelectOptions) {
+		const useDistinct = options?.distinct === true;
 		const pass =
-			selectDistinctRegex.test(statement) && new RegExp(String.raw`\bFROM\s+${escapeRegExp(table)}\b`, "ui").test(statement);
+			(useDistinct ? selectDistinctRegex : selectRegex).test(statement) &&
+			new RegExp(String.raw`\bFROM\s+${escapeRegExp(table)}\b`, "ui").test(statement);
+		const distinctPart = useDistinct ? " distinct" : "";
 
 		return createMatchResult(
 			pass,
-			`expected statement to select distinct from ${table}.`,
-			`expected statement not to select distinct from ${table}.`,
+			`expected statement to select${distinctPart} from ${table}.`,
+			`expected statement not to select${distinctPart} from ${table}.`,
 		);
 	},
 
