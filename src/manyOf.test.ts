@@ -1,5 +1,5 @@
 import { describe, expect, it, jest } from "@jest/globals";
-import { manyOf } from "../src";
+import { manyOf } from ".";
 
 describe("manyOf", () => {
 	it("calls creator function without a template", () => {
