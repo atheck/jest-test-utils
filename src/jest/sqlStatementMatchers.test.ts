@@ -422,6 +422,6 @@ describe("SqlStatementHelpers", () => {
 });
 
 function itCasing(statement: string, name: string, callback: (statement: string) => void): void {
-	// eslint-disable-next-line jest/consistent-test-it, jest/require-top-level-describe, jest/expect-expect, jest/valid-title
+	// eslint-disable-next-line jest/consistent-test-it, jest/require-top-level-describe, jest/valid-title
 	it.each([statement, statement.toUpperCase(), statement.toLowerCase()])(name, callback);
 }
