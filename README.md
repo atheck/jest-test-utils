@@ -21,16 +21,6 @@ Add this to your jest config to extend jest `expect` with [SQL statement matcher
 }
 ```
 
-If you want to mock the `i18next` module, you can also add this to your jest config:
-
-```json
-{
-    "setupFilesAfterEnv": ["node_modules/jest-test-utils/dist/jest/mockI18next.js"]
-}
-```
-
-After this mock is applied `i18next.t()` no longer returns the translation of the provided key but instead returns the key itself, or an object with the translation key and provided options. This way you can use the same function to test that the correct translation values were provided.
-
 ### SQL statement matchers
 
 | function | description |
