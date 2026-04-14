@@ -1,7 +1,7 @@
 function isInstalled(...names: string[]): boolean {
 	for (const name of names) {
 		try {
-			// eslint-disable-next-line @typescript-eslint/no-require-imports
+			// biome-ignore lint/style/noCommonJs: We need dynamic require here.
 			require(name);
 		} catch {
 			return false;

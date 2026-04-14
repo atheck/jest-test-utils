@@ -1,18 +1,24 @@
 {
   "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
   "extends": [
-    "eslint-config-heck/biome"
+    "eslint-config-heck/biomeJsTs"
   ],
   "linter": {
     "rules": {
       "nursery": {
-        "useImportRestrictions": "off",
-        "noMisplacedAssertion": "off"
+        "noShadow": "off"
+      },
+      "performance": {
+        "noBarrelFile": "off"
       }
     }
   },
-  "organizeImports": {
-    "enabled": false
+  "assist": {
+    "actions": {
+      "source": {
+        "organizeImports": "on"
+      }
+    }
   },
   "formatter": {
     "lineWidth": 130
